@@ -1,0 +1,56 @@
+﻿@model HomeViewModel
+
+@{
+    var tempDataValue = TempData["Errors"] as string;
+}
+
+@if (!string.IsNullOrEmpty(tempDataValue))
+{
+    <div id="error-block" class="row error-block">
+        <div class="col-md-11 error-content">
+            <div class="error-header d-flex justify-content-between align-items-center">
+                <h5 class="error-title" id="exampleModalLabel">Errors</h5>
+                <button type="button" id="error-close" class="error-close" data-dismiss="modal" onclick="closeError()" aria-label="Close">
+                    <span class="error-span" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="error-body">
+                <p class="error-text">@tempDataValue</p>
+            </div>
+        </div>
+    </div>
+}
+
+<div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h1 class="headline">Welcome, @User.Identity.Name!</h1>
+    }
+</div>
+<div class="row mt-5 mb-2">
+    <div id="NewsDiv" class="my-4 ">
+        @foreach (var post in Model.Posts)
+        {
+            <div class="post-container mx-auto" style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+                <label class="post-label">Title</label>
+                <p class="post-text">@post.Title</p>
+                <label class="post-label">Post</label>
+                <p class="post-text">@post.Text</p>
+                <div class="post-image-container" style="border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(@post.ImageData)" class="post-image img-responsive full-width">
+                </div>
+                <label class="post-label">Date</label>
+                <p class="post-text">@post.Date</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function closeError() {
+            var errorBlock = document.getElementById('error-block');
+            errorBlock.style.display = 'none';
+        }
+    </script>
+}

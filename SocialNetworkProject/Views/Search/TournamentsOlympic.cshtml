@@ -1,0 +1,147 @@
+﻿@model OlympicTournamentViewModel
+@{
+    ViewData["Title"] = "TournamentOlympic";
+}
+<div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="bracket_page">
+        <div class="bracket">
+            <div class="bracket_header">
+                <span style="color:white"><b>Tournament @Model.Name</b></span> <br>
+                <span class="match_info" style="color:white"><b>Date @Model.StartDate - @Model.EndDate</b></span> <br>
+                <span class="match_info" style="color:white"><b>Prize money @Model.Prize $</b></span> <br>
+                <p class="match_text" style="text-shadow: none;">This is the Olympic tournament grid "@Model.Name", with all the current results, updates will come from the organizers and sponsors of the tournament. Enjoy watching, we are with you.</p>
+            </div>
+            @if (Model.PlayOffTeams.Count != 0)
+            {
+
+                    <div class="row align-items-center" style="justify-content:center;">
+                        <div class="col-md-4">
+                            <h3 style="margin-left: 40px;">1/4 final </h3>
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="Id" />
+                            <div class="row" style="justify-content:center;">
+                                <div class="my-5 d-flex justify-content-center align-items-center" style="flex-direction: column;">
+                                    @for (int i = 0; i < 4; i++)
+                                    {
+                                        <div class="row mb-3 justify-content-center">
+                                            <select asp-for="@Model.Matches[i].Team1.TeamName" class="form-select reglog_select" aria-label="Select Team" style="width: 70%;" disabled>
+                                                <option selected disabled>Select Team</option>
+                                                @foreach (var team in Model.PlayOffTeams)
+                                                {
+                                                    <option class="reglog_option" value="@team.TeamName">@team.TeamName</option>
+                                                }
+                                            </select>
+                                            <input asp-for="Matches[i].Team1Score" class="form-control reglog_input" type="text" style="width: 38px; height: 38px;" readonly />
+                                            <select asp-for="@Model.Matches[i].Team2.TeamName" class="form-select reglog_select" aria-label="Select Team" style="width: 70%;" disabled>
+                                                <option selected disabled>Select Team</option>
+                                                @foreach (var team in Model.PlayOffTeams)
+                                                {
+                                                    <option class="reglog_option" value="@team.TeamName">@team.TeamName</option>
+                                                }
+                                            </select>
+                                            <input asp-for="Matches[i].Team2Score" class="form-control reglog_input" type="text" style="width: 38px; height: 38px;" readonly />
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h3 style="margin-left: 40px;">Semi-final </h3>
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="Id" />
+                            <div class="row" style="justify-content:center;">
+                                <div class="my-5 d-flex justify-content-center align-items-center" style="flex-direction: column;">
+                                    @for (int i = 4; i < 6; i++)
+                                    {
+                                        <div class="row mb-3 justify-content-center">
+                                            <input asp-for="@Model.Matches[i].Team1.TeamName" class="form-control reglog_select" aria-label="Select Team" style="width: 70%;" readonly />
+                                            <input asp-for="@Model.Matches[i].Team1Score" class="form-control reglog_input" type="text" style="width: 38px; height: 38px;" readonly />
+                                            <input asp-for="@Model.Matches[i].Team2.TeamName" class="form-control reglog_select" aria-label="Select Team" style="width: 70%;" readonly />
+                                            <input asp-for="@Model.Matches[i].Team2Score" class="form-control reglog_input" type="text" style="width: 38px; height: 38px;" readonly />
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h3 style="margin-left: 40px;">Final</h3>
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="Id" />
+                            <div class="row" style="justify-content:center;">
+                                <div class="my-5 d-flex justify-content-center align-items-center" style="flex-direction: column;">
+                                    @for (int i = 6; i < 7; i++)
+                                    {
+                                        <div class="row mb-3 justify-content-center">
+                                            <input asp-for="@Model.Matches[i].Team1.TeamName" class="form-control reglog_select" aria-label="Select Team" style="width: 70%;" readonly />
+                                            <input asp-for="Matches[i].Team1Score" class="form-control reglog_input" type="text" style="width: 38px; height: 38px;" readonly />
+                                            <input asp-for="@Model.Matches[i].Team2.TeamName" class="form-control reglog_select" aria-label="Select Team" style="width: 70%;" readonly />
+                                            <input asp-for="Matches[i].Team2Score" class="form-control reglog_input" type="text" style="width: 38px; height: 38px;" readonly />
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="d-flex justify-content-center" style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="m-5" style="width: 70%; background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+        @if (Model.PlayOffTeams.Count == 0)
+        {
+                <input type="hidden" id="DeleteTeamId" name="DeleteTeamId" />
+                <input type="hidden" asp-for="Id" />
+                @if (Model.OlympicTeamLists != null)
+                {
+                    @foreach (var team in Model.OlympicTeamLists)
+                    {
+                        <div class="row align-items-center justify-content-center" style="margin: 15px 15px 15px 15px; background-color: #3f364b">
+                            <div class="col-sm-12 col-lg-4 search-image-container">
+                                @if (team.Team.TeamLogo != null)
+                                {
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(team.Team.TeamLogo)" class="search-image">
+                                }
+                                else
+                                {
+                                    <img src="/img/Unknown.jpg" class="profile-image">
+                                }
+                            </div>
+                            <div class="col-sm-12 col-lg-4 text-center"><code style="color: #fff;">@team.Team.TeamName</code></div>
+                            <div class="col-sm-12 col-lg-4 d-flex justify-content-center">
+                                <input type="hidden" name="OlympicTeamLists[@Model.OlympicTeamLists.IndexOf(team)].id" value="@team.id" />
+                                <input class="form-control reglog_input" name="OlympicTeamLists[@Model.OlympicTeamLists.IndexOf(team)].Score" value="@team.Score" readonly />
+                                <button style="display:none; margin:10px;" class="delete-button btn btn-outline-danger" onclick="deleteTeam('@team.id')">Delete</button>
+                            </div>
+                        </div>
+                    }
+                }
+        }
+        else
+        {
+            @if (Model.OlympicTeamLists.Count != 0)
+            {
+                @for (int i = 0; i < Model.OlympicTeamLists.Count; i++)
+                {
+                    var team = Model.OlympicTeamLists[i];
+                    <div class="row align-items-center justify-content-center" style="background-color: @(i < 8 ? "rgba(0, 167, 113, 0.8)" : "rgba(255, 0, 0, 0.8)"); margin: 15px 15px 15px 15px;">
+                        <div class="col-sm-12 col-lg-4 search-image-container">
+                            @if (team.Team.TeamLogo != null)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(team.Team.TeamLogo)" class="search-image">
+                            }
+                            else
+                            {
+                                <img src="/img/Unknown.jpg" class="profile-image">
+                            }
+                        </div>
+                        <div class="col-sm-12 col-lg-4 text-center"><code style="color: #fff">@team.Team.TeamName</code></div>
+                        <div class="col-sm-12 col-lg-4 text-center"><code style="color: #fff">@team.Score</code></div>
+                    </div>
+                }
+            }
+
+        }
+    </div>
+</div>
+

@@ -1,0 +1,280 @@
+﻿
+@using SocialNetworkProject.Data.Interfaces
+@using SocialNetworkProject.Data.Models
+@model ProfileViewModel<IUserRole>
+
+<div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="row py-4">
+        <div class="col-md-3 d-flex flex-column align-items-center">
+            <div class="profile-image-container" style="border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; margin-bottom: 10px; ">
+                @if (Model.ImageData != null)
+                {
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageData)" class="profile-image">
+                }
+                else
+                {
+                    <img src="/img/Unknown.jpg" class="profile-image">
+                }
+            </div>
+            @if (Model.InSubscriptions == true)
+            {
+                <form id="Unsubscription" asp-action="Unsubscribe" method="post">
+                    <input id="UserNickName" type="hidden" name="Nickname" value="@Model.Nickname" />
+                    <button id="subscribe" type="submit" class="btn btn-outline-info">Unsubscribe</button>
+                </form>
+            }
+            else
+            {
+                <form id="Subscription" asp-action="Subscribe" method="post">
+                    <input id="UserNickName" type="hidden" name="Nickname" value="@Model.Nickname" />
+                    <button id="unsubscribe" type="submit" class="btn btn-outline-info" >Subscribe</button>
+                </form>
+            }
+        </div>
+        <div class="col-md-4 d-flex flex-column justify-content-center p-4">
+            <code>Nickname: @Model.Nickname</code><br>
+            <code>Name: @Model.Name</code><br>
+            <code>Surname: @Model.Surname</code><br>
+            <code>Role: @Model.RoleName</code>
+        </div>
+        <div class="col-md-4 d-flex flex-column justify-content-center p-4">
+            <code>Email: @Model.Email</code><br>
+            <code>Phone: @Model.Phone</code><br>
+            <code>Age: @Model.Age</code><br>
+            <div class="d-flex">
+                <code>Text to @Model.Nickname</code>
+                <a href="/Chat/Chat/@Model.Nickname">
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon src="https://cdn.lordicon.com/amjaykqd.json"
+                               trigger="hover"
+                               colors="primary:#7166ee,secondary:#cb5eee"
+                               stroke="bold"
+                               style="width:30px;height:30px">
+                    </lord-icon>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+        <div class="container-fluid">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="toggleNews()" href="#">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="toggleDetails()" href="#">Details</a>
+                    </li>
+                </ul>
+        </div>
+    </nav>
+</div>
+<div id="NewsDiv" style="display: block;" class="my-4 ">
+    @foreach (var post in Model.Posts)
+    {
+        <div class="post-container mx-auto" style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+            <label class="post-label">Title</label>
+            <p class="post-text">@post.Title</p>
+            <label class="post-label">Post</label>
+            <p class="post-text">@post.Text</p>
+            <div class="post-image-container" style="border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+                <img src="data:image/jpeg;base64,@Convert.ToBase64String(@post.ImageData)" class="post-image">
+            </div>
+            <label class="post-label">Date</label>
+            <p class="post-text">@post.Date</p>
+        </div>
+    }
+</div>
+
+<div id="DetailsDiv" style="margin: 0; display: none; background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; " class="row my-4 p-4">
+    <div class="col-sm-12 mx-sm-2 col-md-6">
+        @if (Model.Role is Gamer)
+        {
+            <input type="hidden" asp-for="Id" />
+            @foreach (var property in typeof(Gamer).GetProperties())
+            {
+                @if (!new List<string> { "UserId", "Id", "Name", "User", "Description", "InLeaders" }.Contains(property.Name))
+                {
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <label>@property.Name</label>
+                            <input class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" readonly />
+                        </div>
+                    </div>
+                }
+                else if (property.Name == "Description")
+                {
+                    <input id="Description" class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" onfocus="GetDescription(this)" style="display:none;" />
+                }
+            }
+        }
+        @if (Model.Role is Streamer)
+        {
+            <input type="hidden" asp-for="Id" />
+            @foreach (var property in typeof(Streamer).GetProperties())
+            {
+                @if (!new List<string> { "UserId", "Id", "Name", "User", "Description", "InLeaders" }.Contains(property.Name))
+                {
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <label>@property.Name</label>
+                            <input class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" readonly />
+                        </div>
+                    </div>
+                }
+                else if (property.Name == "Description")
+                {
+                    <input id="Description" class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" onfocus="GetDescription(this)" style="display:none;" />
+                }
+            }
+        }
+        @if (Model.Role is Commentator)
+        {
+            <input type="hidden" asp-for="Id" />
+            @foreach (var property in typeof(Commentator).GetProperties())
+            {
+                @if (!new List<string> { "UserId", "Id", "Name", "User", "Description", "InLeaders" }.Contains(property.Name))
+                {
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <label>@property.Name</label>
+                            <input class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" readonly />
+                        </div>
+                    </div>
+                }
+                else if (property.Name == "Description")
+                {
+                    <input id="Description" class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" onfocus="GetDescription(this)" style="display:none;" />
+                }
+            }
+        }
+        @if (Model.Role is Sponsor)
+        {
+            <input type="hidden" asp-for="Id" />
+            @foreach (var property in typeof(Sponsor).GetProperties())
+            {
+                @if (!new List<string> { "UserId", "Id", "Name", "User", "Description", "InLeaders" }.Contains(property.Name))
+                {
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <label>@property.Name</label>
+                            <input class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" readonly />
+                        </div>
+                    </div>
+                }
+                else if (property.Name == "Description")
+                {
+                    <input id="Description" class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" onfocus="GetDescription(this)" style="display:none;" />
+                }
+            }
+        }
+        @if (Model.Role is TeamCoach)
+        {
+            <input type="hidden" asp-for="Id" />
+            @foreach (var property in typeof(TeamCoach).GetProperties())
+            {
+                @if (!new List<string> { "UserId", "Id", "Name", "User", "ImageData", "NickName", "Description", "InLeaders", "TeamName" }.Contains(property.Name))
+                {
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <label>@property.Name</label>
+                            <input class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" readonly />
+                        </div>
+                    </div>
+                }
+                else if (property.Name == "Description")
+                {
+                    <input id="Description" class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" onfocus="GetDescription(this)" style="display:none;" />
+                }
+                else if (property.Name == "TeamName")
+                {
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <label>@property.Name</label>
+                            <input class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" readonly />
+                        </div>
+                    </div>
+                }
+            }
+        }
+        @if (Model.Role is Player)
+        {
+            <input type="hidden" asp-for="Id" />
+            @foreach (var property in typeof(Player).GetProperties())
+            {
+                @if (!new List<string> { "UserId", "Id", "Name", "User", "NickName", "TeamId", "Team", "ImageData", "Description", "InLeaders" }.Contains(property.Name))
+                {
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <label>@property.Name</label>
+                            <input class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" readonly />
+                        </div>
+                    </div>
+                }
+                else if (property.Name == "Description")
+                {
+                    <input id="Description" class="form-control reglog_input" type="text" name="Role.@property.Name" value="@property.GetValue(Model.Role)" style="display:none;" />
+                }
+                else if (property.Name == "Team")
+                {
+                    <div class="form-group row">
+                        <div class="col-sm-8">
+                            <label>@property.Name</label>
+                            @{
+                                string teamName = (Model.Role as SocialNetworkProject.Data.Models.Player)?.Team?.TeamName;
+                            }
+
+                            <input class="form-control reglog_input" type="text" value="@teamName" readonly />
+
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+    <div class="col-sm-12 mx-sm-2 col-md-5">
+        <div class="form-group">
+            <div>
+                <label>Additional information</label>
+                <textarea type="text" class="form-control reglog_input" id="DescriptionBlock" name="Description" value="Description" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script>
+        function toggleNews() {
+            var newsDiv = document.getElementById('NewsDiv');
+            var detailsDiv = document.getElementById('DetailsDiv');
+            if (newsDiv.style.display === 'none') {
+                newsDiv.style.display = 'block';
+                detailsDiv.style.display = 'none';
+            } else {
+                newsDiv.style.display = 'none';
+            }
+        }
+        function toggleDetails() {
+            var newsDiv = document.getElementById('NewsDiv');
+            var detailsDiv = document.getElementById('DetailsDiv');
+            if (detailsDiv.style.display === 'none') {
+                detailsDiv.style.display = 'flex';
+                newsDiv.style.display = 'none';
+            } else {
+                detailsDiv.style.display = 'none';
+            }
+        }
+        function GetDescription() {
+            var description = document.getElementById('Description').value
+            document.getElementById('DescriptionBlock').value = description;
+        }
+        GetDescription();
+    </script>
+
+}
+
+
+

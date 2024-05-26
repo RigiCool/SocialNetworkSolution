@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewData["Title"] = "MyTournaments";
+}
+
+<div id="TournamentsDiv" style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <li class="nav-item">
+                <a class="nav-link" onclick="toggleOlympic()" href="#">Olympic Tournament</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="toggleList()" href="#">Classic Tournament</a>
+            </li>
+        </ul>
+    </div>
+    <div id="Olympic" class="list-group">
+        @foreach (var tournamentOlympic in Model.TournamentsOlympic)
+        {
+            <div class="row">
+                <div class="col-md-10">
+                    <a href="/Search/TournamentsOlympic/@tournamentOlympic.Name" class="my-2 row d-flex align-items-center justify-content-evenly">
+                        <div class="col-md-3 d-flex justify-content-center"><p class="search-item">@tournamentOlympic.Name</p></div>
+                        <div class="col-md-3 d-flex justify-content-center"><p class="search-item">@tournamentOlympic.Prize</p></div>
+                        <div class="col-md-3 d-flex justify-content-center"><p class="search-item">@tournamentOlympic.StartDate.ToShortDateString()</p></div>
+                        <div class="col-md-3 d-flex justify-content-center"><p class="search-item">@tournamentOlympic.EndDate.ToShortDateString()</p></div>
+                    </a>
+                </div>
+                <div class="delete-block col-md-2 d-flex justify-content-center align-items-center">
+                    <a class="btn btn-outline-info" href="/Tournament/DeleteTournamentOlympic/@tournamentOlympic.Id">Delete</a>
+                    <lord-icon src="https://cdn.lordicon.com/vlnvqvew.json"
+                               trigger="hover"
+                               colors="primary:#66a1ee,secondary:#cb5eee"
+                               style="width: 50px; height: 50px; margin-bottom: 4px;"
+                               target=".delete-block">
+                    </lord-icon>
+                </div>
+            </div>
+            
+        }
+    </div>
+    <div id="List" class="list-group">
+        @foreach (var tournamentList in Model.TournamentsList)
+        {
+        <div class="row">
+            <div class="col-md-10">
+                <a href="/Search/TournamentsList/@tournamentList.Name" class="my-2 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-md-3 d-flex justify-content-center"><p class="search-item">@tournamentList.Name</p></div>
+                    <div class="col-md-3 d-flex justify-content-center"><p class="search-item">@tournamentList.Prize</p></div>
+                    <div class="col-md-3 d-flex justify-content-center"><p class="search-item">@tournamentList.StartDate.ToShortDateString()</p></div>
+                    <div class="col-md-3 d-flex justify-content-center"><p class="search-item">@tournamentList.EndDate.ToShortDateString()</p></div>
+                </a>
+            </div>
+            <div class="delete-block col-md-2 d-flex justify-content-center align-items-center">
+                <a class="btn btn-outline-info" href="/Tournament/DeleteTournamentList/@tournamentList.Id">Delete</a>
+                <lord-icon src="https://cdn.lordicon.com/vlnvqvew.json"
+                           trigger="hover"
+                           colors="primary:#66a1ee,secondary:#cb5eee"
+                           style="width: 50px; height: 50px; margin-bottom: 4px;"
+                           target=".delete-block">
+                </lord-icon>
+            </div>
+        </div>
+            
+        }
+    </div>
+</div>
+

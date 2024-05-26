@@ -1,0 +1,48 @@
+﻿@model List<Chat>
+@{
+    ViewData["Title"] = "Chats";
+}
+
+<div id="ChatsDiv" style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="list-group">
+        @foreach (var chat in Model)
+        {
+            @if (chat.User1.Nickname == User.Identity.Name)
+            {
+                <a href="/Chat/Chat/@chat.User2.Nickname" class="my-2 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-2 search-image-container">
+                        @if (chat.User2.ImageData != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(chat.User2.ImageData)" class="search-image">
+                        }
+                        else
+                        {
+                            <img src="/img/Unknown.jpg" class="profile-image">
+                        }
+                    </div>
+                    <div class="col-sm-4"><p class="search-item">@chat.User2.Nickname</p></div>
+                    <div class="col-sm-4"><p class="search-item">@chat.User2.Name @chat.User2.Surname</p> </div>
+                </a>
+            }
+            else
+            {
+                <a href="/Chat/Chat/@chat.User1.Nickname" class="my-2 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-2 search-image-container">
+                        @if (chat.User1.ImageData != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(chat.User1.ImageData)" class="search-image">
+                        }
+                        else
+                        {
+                            <img src="/img/Unknown.jpg" class="profile-image">
+                        }
+                    </div>
+                    <div class="col-sm-4"><p class="search-item">@chat.User1.Nickname</p></div>
+                    <div class="col-sm-4"><p class="search-item">@chat.User1.Name @chat.User1.Surname</p> </div>
+                </a>
+            }
+
+        }
+    </div>
+</div>
+

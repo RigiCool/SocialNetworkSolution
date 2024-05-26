@@ -1,0 +1,159 @@
+﻿@model ListTournamentViewModel
+@{
+    ViewData["Title"] = "TournamentList";
+}
+
+<div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="bracket_header">
+        <span style="color:white"><b>Tournament @Model.Name</b></span> <br>
+        <span class="match_info" style="color:white"><b>Date @Model.StartDate - @Model.EndDate</b></span> <br>
+        <span class="match_info" style="color:white"><b>Prize money @Model.Prize $</b></span> <br>
+        <p class="match_text" style="text-shadow: none;">This is the Olympic tournament grid "@Model.Name", with all the current results, updates will come from the organizers and sponsors of the tournament. Enjoy watching, we are with you.</p>
+    </div>
+</div>
+@if (Model.Complete == false)
+{
+    <div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+        <div class="py-4 mx-4">
+            <form asp-action="AddTeamClassic" method="post">
+                <input type="hidden" asp-for="Id" />
+                <label asp-for="NewTeam.TeamName"></label>
+                <div>
+                    <input type="datetime" asp-for="NewTeam.TeamName" class="form-control reglog_input" style="width: 50%;" />
+                    <span asp-validations-for="NewTeam.TeamName" class="text-danger"></span>
+                </div>
+                <button class="btn btn-outline-info my-2" type="submit">Add new team</button>
+            </form>
+            @{
+                var tempDataValue = TempData["Errors"] as string;
+            }
+
+            @if (!string.IsNullOrEmpty(tempDataValue))
+            {
+                <div id="error-block" class="row error-block">
+                    <div class="col-md-11 error-content">
+                        <div class="error-body">
+                            <p class="error-text">@tempDataValue</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<div class="d-flex justify-content-center" style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="m-5" style="width: 70%; background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+        @if (Model.Complete == false)
+        {
+            <form id="teamForm" asp-action="SaveTeamClassic" method="post">
+                <button id="completeButton" type="button" class="btn btn-outline-info" style="margin: 15px 15px 15px 15px; display: @(Model.ClassicTeamLists.Count < 3 ? "none" : "block"); " onclick="ToggleComplete()">Complete Stage</button>
+                <select id="selectTeam" asp-for="@Model.Type" class="form-select reglog_select" aria-label="Select Team" style="width: 70%; margin: 15px 15px 15px 15px;">
+                    <option disabled selected>Select Team</option>
+                    <option class="reglog_option" value="3">Top 3</option>
+                    <option class="reglog_option" value="5">Top 5</option>
+                    <option class="reglog_option" value="8">Top 8</option>
+                    <option class="reglog_option" value="10">Top 10</option>
+                </select>
+                <input type="hidden" id="DeleteTeamId" name="DeleteTeamId" />
+                <input type="hidden" asp-for="Id" />
+                @if (Model.ClassicTeamLists != null)
+                {
+                    @foreach (var team in Model.ClassicTeamLists)
+                    {
+                        <div class="row align-items-center justify-content-center" style="margin: 15px 15px 15px 15px; background-color: #3f364b">
+                            <div class="col-sm-12 col-lg-4 search-image-container">
+                                @if (team.Team.TeamLogo != null)
+                                {
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(team.Team.TeamLogo)" class="search-image">
+                                }
+                                else
+                                {
+                                    <img src="/img/Unknown.jpg" class="profile-image">
+                                }
+                            </div>
+                            <div class="col-sm-12 col-lg-4 text-center"><code style="color: #fff;">@team.Team.TeamName</code></div>
+                            <div class="col-sm-12 col-lg-4 d-flex justify-content-center">
+                                <input type="hidden" name="ClassicTeamLists[@Model.ClassicTeamLists.IndexOf(team)].id" value="@team.id" />
+                                <input class="form-control reglog_input" name="ClassicTeamLists[@Model.ClassicTeamLists.IndexOf(team)].Score" value="@team.Score" readonly />
+                                <button style="display:none; margin:10px;" class="delete-button btn btn-outline-danger" onclick="deleteTeam('@team.id')">Delete</button>
+                            </div>
+                        </div>
+                    }
+                }
+                <button id="editButton" type="button" class="btn btn-outline-info" style="margin: 15px 15px 15px 15px; display: @(Model.ClassicTeamLists.Count == 0 ? "none" : "block");" onclick="ToggleEdit(this)">Edit</button>
+                <button id="saveButton" style="display: none; margin: 15px 15px 15px 15px; " type="submit" class="btn btn-outline-info">Save</button>
+                <button id="cancelButton" style="display: none; margin: 15px 15px 15px 15px;" type="button" class="btn btn-outline-info" onclick="cancelEdit()">Cancel</button>
+            </form>
+        }
+        else
+        {
+            @if (Model.ClassicTeamLists != null)
+            {
+                @for (int i = 0; i < Model.ClassicTeamLists.Count; i++)
+                {
+                    var team = Model.ClassicTeamLists[i];
+                    <div class="row align-items-center justify-content-center" style="margin: 15px 15px 15px 15px; background-color: @(i < Model.Type ? "rgba(0, 167, 113, 0.8)" : "rgba(255, 0, 0, 0.8)")">
+                        <div class="col-sm-12 col-lg-4 search-image-container">
+                            @if (team.Team.TeamLogo != null)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(team.Team.TeamLogo)" class="search-image">
+                            }
+                            else
+                            {
+                                <img src="/img/Unknown.jpg" class="profile-image">
+                            }
+                        </div>
+                        <div class="col-sm-12 col-lg-4 text-center"><code style="color: #fff">@team.Team.TeamName</code></div>
+                        <div class="col-sm-12 col-lg-4 text-center"><code style="color: #fff">@team.Score</code></div>
+                    </div>
+                }
+            }
+
+        }
+    </div>
+</div>
+@section Scripts{
+    <script>
+        function ToggleEdit(button) {
+            var scores = document.querySelectorAll('[name^="ClassicTeamLists"]');
+            var select = document.getElementById('selectTeam');
+            select.disabled = !select.disabled;
+            scores.forEach(function (scoreInput) {
+                scoreInput.readOnly = !scoreInput.readOnly;
+            });
+
+            var deleteButtons = document.querySelectorAll('.delete-button');
+
+            deleteButtons.forEach(function (deleteButton) {
+                deleteButton.style.display = deleteButton.style.display === 'none' ? 'block' : 'none';
+            });
+
+            var editButton = document.getElementById('editButton');
+            var saveButton = document.getElementById('saveButton');
+            var cancelButton = document.getElementById('cancelButton');
+            var completeButton = document.getElementById('completeButton');
+
+            editButton.style.display = editButton.style.display === 'none' ? 'block' : 'none';
+            saveButton.style.display = saveButton.style.display === 'none' ? 'block' : 'none';
+            cancelButton.style.display = cancelButton.style.display === 'none' ? 'block' : 'none';
+            completeButton.style.display = cancelButton.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function deleteTeam(teamId) {
+            document.getElementById('DeleteTeamId').value = teamId;
+            document.getElementById('teamForm').action = '@Url.Action("DeleteTeamClassic", "Tournament")';
+            document.getElementById('teamForm').submit();
+        }
+
+        function cancelEdit() {
+            document.getElementById('teamForm').reset();
+            ToggleEdit();
+        }
+        function ToggleComplete() {
+            document.getElementById('teamForm').action = '@Url.Action("ListTournamentComplete", "Tournament")';
+            document.getElementById('teamForm').submit();
+        }
+    </script>
+}
+

@@ -1,0 +1,48 @@
+﻿@model NewTournamentViewModel
+@{
+    ViewData["Title"] = "CreateTournamentOlympic";
+}
+<div class="modal-overlay">
+    <div class="modal-body">
+        <div class="modal-content">
+            <h2>Create Tournament</h2>
+            <!-- Form for creating a post -->
+            <form method="post" class="form-horizontal">
+                <label class="my-2" asp-for="TournamentName"></label>
+                <div>
+                    <input asp-for="TournamentName" class="form-control reglog_input" />
+                    <span asp-validations-for="TournamentName" class="text-danger"></span>
+                </div>
+                <div><span asp-validation-for="TournamentName" class="text-danger"></span></div>
+                <label class="my-2" asp-for="TournamentType"></label>
+                <select asp-for="TournamentType" class="form-select reglog_select" aria-label="Default select example">
+                    <option selected disabled>Select Role</option>
+                    <option class="reglog_option" value="Tournament Olympic">Tournament Olympic</option>
+                    <option class="reglog_option" value="Tournament List">Tournament List</option>
+                </select>
+                <div><span asp-validation-for="TournamentType" class="text-danger"></span></div>
+                <label class="my-2" asp-for="Prize"></label>
+                <div>
+                    <input asp-for="Prize" class="form-control reglog_input" />
+                    <span asp-validations-for="Prize" class="text-danger"></span>
+                </div>
+                <div><span asp-validation-for="Prize" class="text-danger"></span></div>
+                <label class="my-2" asp-for="StartDate"></label>
+                <div>
+                    <input type="date" asp-for="StartDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control reglog_input" />
+                    <span asp-validations-for="StartDate" class="text-danger"></span>
+                </div>
+
+                <label class="my-2" asp-for="EndDate"></label>
+                <div>
+                    <input type="date" asp-for="EndDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control reglog_input" />
+                    <span asp-validations-for="EndDate" class="text-danger"></span>
+                </div>
+                <br />
+                <button class="btn btn-outline-info my-2" type="submit" name="action" value="CreateTournamentOlympic">Create Tournament</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+

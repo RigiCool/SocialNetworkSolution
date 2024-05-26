@@ -1,0 +1,263 @@
+﻿
+@model SearchViewModel
+@{
+    string searchString = Context.Request.Query["searchString"];
+    List<User> searchUsers = new List<User>();
+    List<Team> searchTeams = new List<Team>();
+    List<TournamentOlympic> searchTournamentOlympic = new List<TournamentOlympic>();
+    List<TournamentList> searchTournamentList = new List<TournamentList>();
+
+    if (!string.IsNullOrEmpty(searchString))
+    {
+        searchUsers = Model.Users.Where(u => u.Nickname.Contains(searchString) || u.Name.Contains(searchString) || u.Surname.Contains(searchString)).ToList();
+        searchTeams = Model.Teams.Where(t => t.TeamName.Contains(searchString)).ToList();
+        searchTournamentOlympic = Model.TournamentsOlympic.Where(to => to.Name.Contains(searchString)).ToList();
+        searchTournamentList = Model.TournamentsList.Where(tl => tl.Name.Contains(searchString)).ToList();
+    }
+}
+<div>
+    <div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearchCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSearchCollapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="toggleAll()" href="#">All</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="toggleUsers()" href="#">Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="toggleTeams()" href="#">Teams</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="toggleTournaments()" href="#">Tournaments</a>
+                        </li>
+                    </ul>
+                </div>
+                <form class="d-flex" method="get" role="search">
+                    <input class="form-control me-2" type="search" name="searchString" placeholder="Search" aria-label="Search" value="@searchString">
+                    <button class="btn btn-outline-info" type="submit" onclick="toggleSearch()">Search</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+    <div id="SearchDiv" style="display: @(searchString != null ? "block" : "none"); background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+        <p style="font-size: 20px; margin-top: 10px; margin-left: 20px;" class="search-item">Search results</p>
+        <div class="list-group">
+            @foreach (var user in searchUsers)
+            {
+                <a href="/Search/Users/@user.Nickname" class="my-2 mx-0 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-2 search-image-container">
+                        @if (user.ImageData != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(user.ImageData)" class="search-image">
+                        }
+                        else
+                        {
+                            <img src="/img/Unknown.jpg" class="profile-image">
+                        }
+                    </div>
+                    <div class="col-sm-4"><p class="search-item">@user.Nickname</p></div>
+                    <div class="col-sm-4"><p class="search-item">@user.Name @user.Surname</p> </div>
+                    <div class="col-sm-2"><p class="search-item">@user.Role.Name</p></div>
+                </a>
+            }
+        </div>
+        <div class="list-group">
+            @foreach (var team in searchTeams)
+            {
+                <a href="/Search/Teams/@team.TeamName" class="my-2 mx-0 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-2 search-image-container">
+                        @if (team.TeamLogo != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(team.TeamLogo)" class="search-image">
+                        }
+                        else
+                        {
+                            <img src="/img/Unknown.jpg" class="profile-image">
+                        }
+                    </div>
+                    <div class="col-sm-4"><p class="search-item">@team.TeamName</p></div>
+                    <div class="col-sm-4"><p class="search-item">@team.Desc</p> </div>
+                    <div class="col-sm-2"><p class="search-item">Team: @team.PlayerCount</p></div>
+                </a>
+            }
+        </div>
+        <div id="Olympic" class="list-group">
+            @foreach (var tournamentOlympic in searchTournamentOlympic)
+            {
+                <a href="/Search/TournamentsOlympic/@tournamentOlympic.Name" class="my-2 mx-0 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-4"><p class="search-item">@tournamentOlympic.Name</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentOlympic.Prize</p>@tournamentOlympic.Prize</div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentOlympic.StartDate.ToShortDateString()</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentOlympic.EndDate.ToShortDateString()</p></div>
+                    <div class="col-sm-2"><p class="search-item">@{if (tournamentOlympic.Stage >= 4) { <text>Finished</text>; } else { <text>Active</text>; }}</p></div>
+                </a>
+            }
+        </div>
+        <div id="List" class="list-group">
+            @foreach (var tournamentList in searchTournamentList)
+            {
+                <a href="/Search/TournamentsList/@tournamentList.Name" class="my-2 mx-0 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-4"><p class="search-item">@tournamentList.Name</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentList.Prize</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentList.StartDate.ToShortDateString()</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentList.EndDate.ToShortDateString()</p></div>
+                    <div class="col-sm-2"><p class="search-item">@{if (tournamentList.Complete == true) { <text>Finished</text>; } else { <text>Active</text>; }}</p></div>
+                </a>
+            }
+        </div>
+    </div>
+
+
+
+
+
+    <div id="UsersDiv" style="display: @(searchString == null ? "block" : "none"); background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+        <div class="list-group">
+            @foreach (var user in Model.Users)
+            {
+                <a href="/Search/Users/@user.Nickname" class="my-2 mx-0 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-2 search-image-container">
+                        @if (user.ImageData != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(user.ImageData)" class="search-image">
+                        }
+                        else
+                        {
+                            <img src="/img/Unknown.jpg" class="profile-image">
+                        }
+                    </div>
+                    <div class="col-sm-4"><p class="search-item">@user.Nickname</p></div>
+                    <div class="col-sm-4"><p class="search-item">@user.Name @user.Surname</p> </div>
+                    <div class="col-sm-2"><p class="search-item">@user.Role.Name</p></div>
+                </a>
+            }
+        </div>
+    </div>
+    <div id="TeamsDiv" style="display: @(searchString == null ? "block" : "none"); background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+        <div class="list-group">
+            @foreach (var team in Model.Teams)
+            {
+                <a href="/Search/Teams/@team.TeamName" class="my-2 mx-0 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-2 search-image-container">
+                        @if (team.TeamLogo != null)
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(team.TeamLogo)" class="search-image">
+                        }
+                        else
+                        {
+                            <img src="/img/Unknown.jpg" class="profile-image">
+                        }
+                    </div>
+                    <div class="col-sm-4"><p class="search-item">@team.TeamName</p></div>
+                    <div class="col-sm-4"><p class="search-item">@team.Desc</p> </div>
+                    <div class="col-sm-2"><p class="search-item">Team: @team.PlayerCount</p></div>
+                </a>
+            }
+        </div>
+    </div>
+    <div id="TournamentsDiv" style="display:@(searchString == null ? "block" : "none"); background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+        <div id="Olympic" class="list-group">
+            @foreach (var tournamentOlympic in Model.TournamentsOlympic)
+            {
+                <a href="/Search/TournamentsOlympic/@tournamentOlympic.Name" class="my-2 mx-0 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-4"><p class="search-item">@tournamentOlympic.Name</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentOlympic.Prize</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentOlympic.StartDate.ToShortDateString()</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentOlympic.EndDate.ToShortDateString()</p></div>
+                    <div class="col-sm-2"><p class="search-item">@{if (tournamentOlympic.Stage >= 4) { <text>Finished</text>; } else { <text>Active</text>; }}</p></div>
+                </a>
+            }
+        </div>
+        <div id="List" class="list-group">
+            @foreach (var tournamentList in Model.TournamentsList)
+            {
+                <a href="/Search/TournamentsList/@tournamentList.Name" class="my-2 mx-0 row d-flex align-items-center justify-content-evenly">
+                    <div class="col-sm-4"><p class="search-item">@tournamentList.Name</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentList.Prize</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentList.StartDate.ToShortDateString()</p></div>
+                    <div class="col-sm-2"><p class="search-item">@tournamentList.EndDate.ToShortDateString()</p></div>
+                    <div class="col-sm-2"><p class="search-item">@{if (tournamentList.Complete == true) { <text>Finished</text>; } else { <text>Active</text>; }}</p></div>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>
+        function toggleAll() {
+            @{searchString = null;}
+            toggleDisplay('UsersDiv', true);
+            toggleDisplay('TeamsDiv', true);
+            toggleDisplay('TournamentsDiv', true);
+            toggleDisplay('SearchDiv', false);
+        }
+
+        function toggleUsers() {
+            @{searchString = null;}
+            toggleDisplay('UsersDiv', true);
+            toggleDisplay('TeamsDiv', false);
+            toggleDisplay('TournamentsDiv', false);
+            toggleDisplay('SearchDiv', false);
+        }
+
+        function toggleTeams() {
+            @{searchString = null;}
+            toggleDisplay('UsersDiv', false);
+            toggleDisplay('TeamsDiv', true);
+            toggleDisplay('TournamentsDiv', false);
+            toggleDisplay('SearchDiv', false);
+        }
+
+        function toggleTournaments() {
+            @{searchString = null;}
+            toggleDisplay('UsersDiv', false);
+            toggleDisplay('TeamsDiv', false);
+            toggleDisplay('TournamentsDiv', true);
+            toggleDisplay('SearchDiv', false);
+        }
+        function toggleSearch() {
+            toggleDisplay('UsersDiv', false);
+            toggleDisplay('TeamsDiv', false);
+            toggleDisplay('TournamentsDiv', false);
+            toggleDisplay('SearchDiv', true);
+        }
+
+        function toggleDisplay(elementId, isVisible) {
+            var element = document.getElementById(elementId);
+            if (element) {
+                element.style.display = isVisible ? 'block' : 'none';
+            }
+        }
+
+        function toggleOlympic() {
+            var olympic = document.getElementById('Olympic');
+            var classic = document.getElementById('List');
+            if (olympic.style.display === 'none') {
+                olympic.style.display = 'block';
+                classic.style.display = 'none';
+            } else {
+                olympic.style.display = 'none';
+            }
+        }
+        function toggleList() {
+            var olympic = document.getElementById('Olympic');
+            var classic = document.getElementById('List');
+            if (classic.style.display === 'none') {
+                classic.style.display = 'block';
+                olympic.style.display = 'none';
+            } else {
+                classic.style.display = 'none';
+            }
+        }
+    </script>
+
+}
+

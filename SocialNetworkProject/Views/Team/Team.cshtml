@@ -1,0 +1,184 @@
+﻿@model TeamViewModel
+@{
+    ViewData["Title"] = "Team";
+}
+@if (TempData["Errors"] != null)
+{
+    <div id="error-block" class="row error-block">
+        <div class="col-md-11 error-content">
+            <div class="error-body">
+                @foreach (string error in TempData["Errors"] as string[])
+                {
+                    <p class="error-text">@error</p>
+                }
+            </div>
+        </div>
+    </div>
+}
+<div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="row py-4">
+        <div class="col-md-12 col-sm-12 px-5">
+            <code style="color:#fff; font-size: 30px;">Team @Model.TeamName</code><br>
+        </div>
+        <div class="col-md-6 col-sm-12 px-5">
+            <code style="color:#fff; font-size: 25px;">Team players @Model.PlayerCount</code><br>
+        </div>
+        <div class="col-md-6 col-sm-12 my-1 d-flex justify-content-md-center justify-content-sm-end align-items-center">
+            <form id="deleteForm" asp-action="DeleteTeam" method="post" class="form-horizontal">
+                <input type="hidden" id="DeleteTeamId" name="Id" />
+                <div class="delete-block d-flex align-items-center">
+                    <button type="button" class="btn btn-outline-info" onclick="deleteTeam(@Model.Id)">Delete</button>
+                    <lord-icon src="https://cdn.lordicon.com/vlnvqvew.json"
+                               trigger="hover"
+                               colors="primary:#66a1ee,secondary:#cb5eee"
+                               style="width: 50px; height: 50px; margin-bottom: 4px;"
+                               target=".delete-block">
+                    </lord-icon>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1; ">
+    <div class="bracket_page">
+        <div class="bracket">
+            <form id="teamForm" asp-action="Team" method="post" class="form-horizontal" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="TeamCoach.UserId" />
+                <input type="hidden" id="DeletePlayerId" asp-for="DeletePlayerId" name="DeletePlayerId" />
+                <div class="row d-flex justify-content-center p-4">
+                    <div class="col-md-4">
+                        <label class="my-4" style="font-weight: 700;">Team Logo</label>
+                        <div class="d-flex flex-column justify-content-center align-items-center">
+                            <div class="profile-image-container" style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1;">
+                                @if (Model.TeamLogo != null)
+                                {
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.TeamLogo)" class="profile-image">
+                                }
+                                else
+                                {
+                                    <img src="/img/Unknown.jpg" class="profile-image">
+                                }
+                            </div>
+                            <input class="form-control reglog_input" id="TeamLogo" asp-for="TeamLogo" type="file" onchange="toggleDone()" hidden />
+                            <div style="display: none; align-items: center;" id="picInput" class="file-block form-group">
+                                <label for="TeamLogo" class="post-text" style="margin: 0; cursor: pointer;">Choose a photo...</label>
+                                <span asp-validation-for="TeamLogo" class="text-danger"></span>
+                                <lord-icon src="https://cdn.lordicon.com/vczwnict.json"
+                                           trigger="hover"
+                                           stroke="bold"
+                                           style="width:50px;height:50px"
+                                           colors="primary:#7166ee,secondary:#cb5eee"
+                                           target=".file-block">
+                                </lord-icon>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="my-4" style="font-weight: 700;">Team Coach</label>
+                        <div class="d-flex justify-content-center">
+                            <a href="/Search/Users/@Model.TeamCoach.NickName" class="list-group-item list-group-item-action" style="width: 200px;height: 200px;">
+                                <div class="profile-image-container" style="background-color: rgb(35 35 45); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 5px solid transparent; border-image: linear-gradient(35deg, rgba(38, 41, 254, 0.8), rgba(211, 38, 254, 0.8)) 1;">
+                                    @if (Model.TeamCoach.User.ImageData != null)
+                                    {
+                                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.TeamCoach.User.ImageData)" class="profile-image">
+                                    }
+                                    else
+                                    {
+                                        <img src="/img/Unknown.jpg" class="profile-image">
+                                    }
+                                </div>
+                            </a>
+                        </div>
+                        <input class="form-control reglog_input" id="Team" name="TeamCoach.NickName" value="@Model.TeamCoach.NickName" readonly />
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-center p-4">
+                    <div class="col-md-9">
+                        <h5 style="font-weight: 700;">Additional Information</h5>
+                        <label class="my-4">Team Site</label>
+                        <input class="form-control reglog_input" id="Team" type="text" name="TeamSite" value="@Model.TeamSite" readonly />
+                        <label class="my-4">Team Description</label>
+                        <input class="form-control reglog_input" id="Team" type="text" name="Desc" value="@Model.Desc" readonly />
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-center">
+                    @for (var i = 0; i < Model.Players.Count; i++)
+                    {
+                        var player = Model.Players[i];
+                        <div class="col-md-2 col-sm-5 cards__inner">
+
+                            @if (player.ImageData != null)
+                            {
+                                <a href="/Search/Users/@player.NickName" class="list-group-item list-group-item-action">
+                                    <div class="cards__img">
+                                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(player.ImageData)" class="profile-image">
+                                    </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="cards__img">
+                                    <img src="/img/Unknown.jpg" class="profile-image">
+                                </div>
+                            }
+                            <input type="hidden" name="Players[@i].Id" value="@player.Id" />
+                            <input class="form-control reglog_input" id="Team" name="Players[@i].NickName" value="@player.NickName" readonly />
+                            <div class="d-flex justify-content-center">
+                                <button style="display:none;" class="delete-button btn btn-outline-info" onclick="deletePlayer('@player.Id')">Delete</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <button id="editButton" type="button" class="btn btn-outline-info m-4" onclick="ToggleEdit(this)">Edit</button>
+                <div class="m-4 py-4">
+                    <button id="saveButton" style="display:none" type="submit" class="btn btn-outline-info">Save</button>
+                    <button id="cancelButton" style="display:none" type="button" class="btn btn-outline-info" onclick="cancelEdit()">Cancel</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        function ToggleEdit(button) {
+            var inputs = document.querySelectorAll('#Team');
+            var picInput = document.getElementById('picInput')
+            inputs.forEach(function (input) {
+                input.readOnly = !input.readOnly;
+            });
+
+            var deleteButtons = document.querySelectorAll('.delete-button');
+
+            deleteButtons.forEach(function (deleteButton) {
+                deleteButton.style.display = deleteButton.style.display === 'none' ? 'block' : 'none';
+            });
+
+            var editButton = document.getElementById('editButton');
+            var saveButton = document.getElementById('saveButton');
+            var cancelButton = document.getElementById('cancelButton');
+
+            editButton.style.display = editButton.style.display === 'none' ? 'block' : 'none';
+            saveButton.style.display = saveButton.style.display === 'none' ? 'block' : 'none';
+            cancelButton.style.display = cancelButton.style.display === 'none' ? 'block' : 'none';
+            picInput.style.display = picInput.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function deletePlayer(teamId) {
+            document.getElementById('DeletePlayerId').value = teamId;
+            document.getElementById('teamForm').action = '@Url.Action("DeletePlayer", "Team")';
+            document.getElementById('teamForm').submit();
+        }
+        function deleteTeam(teamId) {
+            document.getElementById('DeleteTeamId').value = teamId;
+            document.getElementById('deleteForm').submit();
+        }
+
+        function cancelEdit() {
+            document.getElementById('teamForm').reset();
+            ToggleEdit();
+        }
+    </script>
+}
